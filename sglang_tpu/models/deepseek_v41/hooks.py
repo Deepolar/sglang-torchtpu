@@ -180,10 +180,10 @@ def select_tpu_dsv41_loader(result, load_config, model_config=None):
     if (
         type(result) is not RunaiModelStreamerLoader
         or getattr(config, "model_type", None) != "deepseek_v41"
-        or getattr(model_config, "is_draft_model", False)
         or load_config.draft_model_idx is not None
     ):
         return result
+    # The DSpark draft also comes here: the loader streams only its mtp.* tensors.
     from sglang_tpu.models.deepseek_v41.loader import DSV41RunaiModelStreamerLoader
 
     return DSV41RunaiModelStreamerLoader(load_config, model_config)
