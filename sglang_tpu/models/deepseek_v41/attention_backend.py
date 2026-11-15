@@ -405,7 +405,9 @@ class DSV41TPUAttnBackend(AttentionBackend):
         self.rope_tables: Dict[int, torch.Tensor] = {}
         self.csa2_ops, self.indexer_ops = self._register_ops()
         self._prewarm_model_caches()
-        self._drop_text_only_image_mask(model_runner)
+        # The DSpark draft has no inner .model, Engram layers or image-token mask.
+        if not self.is_dspark_draft:
+            self._drop_text_only_image_mask(model_runner)
 
     @staticmethod
     def _drop_text_only_image_mask(model_runner) -> None:
