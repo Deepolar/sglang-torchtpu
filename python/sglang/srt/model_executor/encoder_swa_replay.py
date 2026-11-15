@@ -207,8 +207,11 @@ def _fold_batch(*, batch, runner, rows) -> FoldedExtend:
         if r:
             head = list(req.full_untruncated_fill_ids[pre[i] : pre[i] + r])
             ids.append(torch.tensor(head, dtype=batch.input_ids.dtype, device=device))
+            # req_to_token may be host-resident (TPU) while out_cache_loc is not.
             locs.append(
-                req_to_token[batch.req_pool_indices[i], pre[i] : pre[i] + r].long()
+                req_to_token[batch.req_pool_indices[i], pre[i] : pre[i] + r]
+                .to(batch.out_cache_loc.device)
+                .long()
             )
             cpu_ids.append(torch.tensor(head, dtype=torch.int64))
         ids.append(batch.input_ids[off : off + n])
